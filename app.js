@@ -18,6 +18,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.post("/api/register", userController.register);
 app.post("/api/login", userController.login);
 
+app.get("/api/users", userController.getUsers)
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

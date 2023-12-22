@@ -67,7 +67,25 @@ const login = async (req, res) => {
   }
 };
 
+const getUsers = async (req, res) => {
+  try {
+    const response = await UserModel.find();
+
+    res.status(200).json({
+      success: true,
+      message: "Done",
+      data: response,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      errorMessage: error,
+    });
+  }
+};
+
 export default {
   register,
   login,
+  getUsers,
 };
