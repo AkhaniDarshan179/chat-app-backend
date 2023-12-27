@@ -36,7 +36,7 @@ const login = async (req, res) => {
     const isUser = await UserModel.findOne({ username });
 
     if (!isUser) {
-      res.status(409).json({
+      return res.status(409).json({
         success: false,
         message: "User not found!",
       });
@@ -45,27 +45,28 @@ const login = async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, isUser.password);
 
     if (!passwordMatch) {
-      res.status(404).json({
+      return res.status(404).json({
         message: "Invalid Password",
       });
-    } else {
-      const tokens = GenerateTokens(isUser);
-      const { accessToken, refreshToken } = tokens;
-
-      res.status(200).json({
-        message: "Log In successfully.",
-        success: true,
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-      });
     }
+
+    const tokens = GenerateTokens(isUser);
+    const { accessToken, refreshToken } = tokens;
+
+    return res.status(200).json({
+      message: "Log In successfully.",
+      success: true,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
   } catch (error) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
-      errorMessage: error,
+      errorMessage: error.message, 
     });
   }
 };
+
 
 const getUsers = async (req, res) => {
   try {

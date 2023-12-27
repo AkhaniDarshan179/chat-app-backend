@@ -33,10 +33,21 @@ app.post("/api/login", userController.login);
 app.get("/api/users", userController.getUsers);
 
 io.on("connection", (socket) => {
-  console.log("Socket connection established on the backend!");
+  console.log("New Connection");
+
+  socket.on("joined", (data) => {
+
+    // console.log("data", data);
+  });
+
+  socket.on("message", (data) => {
+    console.log("MESSAGE");
+    console.log('data', data);
+
+  })
 
   socket.on("disconnect", () => {
-    console.log("Socket disconnected on the backend!");
+    // console.log("Socket disconnected on the backend!");
   });
 });
 
