@@ -70,7 +70,9 @@ const login = async (req, res) => {
 
 const getUsers = async (req, res) => {
   try {
-    const response = await UserModel.find();
+    const { userId } = req.query;
+
+    const response = await UserModel.find({ _id: { $ne: userId } });
 
     const userData = response.map((user) => {
       const { username, socketId, updatedAt } = user;
