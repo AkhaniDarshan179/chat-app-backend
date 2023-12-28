@@ -1,10 +1,27 @@
-import mongoose from "mongoose";
-import bcrypt from "bcrypt";
+const mongoose = require('mongoose');
 
-const chatroomSchema = new mongoose.Schema({
-  username: { type: String, require: "Username is required!" },
+const messageSchema = new mongoose.Schema({
+  sender: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  receiver: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+  timestamp: {
+    type: Date,
+    default: Date.now,
+  },
+  // You can add more message-related fields as needed
 });
 
-const ChatroomModel = mongoose.model("chatroom", chatroomSchema);
+const Message = mongoose.model('Message', messageSchema);
 
-export default ChatroomModel;
+module.exports = Message;

@@ -5,6 +5,10 @@ import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import userController from "./controllers/userController.js";
+import messageController from "./controllers/messageController.js";
+import UserModel from "./model/User.js";
+
+let sockets = {};
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -32,22 +36,32 @@ app.post("/api/register", userController.register);
 app.post("/api/login", userController.login);
 app.get("/api/users", userController.getUsers);
 
+app.post("/api/messages", messageController.sendMesage);
+app.get(
+  "/api/messages/:user1/:user2",
+  messageController.getMessagesBetweenUsers
+);
+
 io.on("connection", (socket) => {
-  console.log("New Connection");
+  socket.on("sendMessage", (data) => {
 
-  socket.on("joined", (data) => {
-
-    // console.log("data", data);
+    io.to(data.to).emit("messageReceived", {
+      message: data.message,
+      from: socket.id
+    })
   });
 
-  socket.on("message", (data) => {
-    console.log("MESSAGE");
-    console.log('data', data);
+  socket.on("save_socket_id",async (data) => {
+    sockets[data.userId] = socket.id;
+    await UserModel.updateOne({ _id: data.userId}, { $set: {socketId: socket.id }});
 
+    const users = await UserModel.find({}, { password: 0});
+
+    socket.broadcast.emit("user_updates", {sockets} )
   })
 
   socket.on("disconnect", () => {
-    // console.log("Socket disconnected on the backend!");
+    console.log("User disconnected");
   });
 });
 

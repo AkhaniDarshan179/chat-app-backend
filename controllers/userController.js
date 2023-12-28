@@ -58,24 +58,29 @@ const login = async (req, res) => {
       success: true,
       accessToken: accessToken,
       refreshToken: refreshToken,
+      userId: isUser._id,
     });
   } catch (error) {
     return res.status(400).json({
       success: false,
-      errorMessage: error.message, 
+      errorMessage: error.message,
     });
   }
 };
-
 
 const getUsers = async (req, res) => {
   try {
     const response = await UserModel.find();
 
+    const userData = response.map((user) => {
+      const { username, socketId, updatedAt } = user;
+      return { username, socketId, updatedAt };
+    });
+
     res.status(200).json({
       success: true,
       message: "Done",
-      data: response,
+      data: userData,
     });
   } catch (error) {
     res.status(400).json({

@@ -1,20 +1,23 @@
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
 
 const messageSchema = new mongoose.Schema({
-  chatroom: {
+  sender: {
     type: mongoose.Schema.Types.ObjectId,
-    require: "Chatroom is required!",
-    ref: "Chatroom",
+    ref: 'User',
+    required: true,
   },
-  chatroom: {
+  receiver: {
     type: mongoose.Schema.Types.ObjectId,
-    require: "User is required!",
-    ref: "User",
+    ref: 'User',
+    required: true,
   },
-  message: {
+  content: {
     type: String,
-    require: "Message is required!",
+    required: true,
+  },
+  timestamp: {
+    type: Date,
+    default: Date.now,
   },
 });
 
