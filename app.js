@@ -59,6 +59,11 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("updateUserStatus", async (data) => {
+    await UserModel.findByIdAndUpdate(data.userId, { status: data.status });
+    socket.broadcast.emit("user_updates", { sockets });
+  });
+
   socket.on("save_socket_id", async (data) => {
     sockets[data.userId] = socket.id;
     await UserModel.updateOne(
