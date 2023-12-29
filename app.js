@@ -7,6 +7,7 @@ import cors from "cors";
 import userController from "./controllers/userController.js";
 import messageController from "./controllers/messageController.js";
 import UserModel from "./model/User.js";
+import MessageModel from "./model/Message.js";
 
 let sockets = {};
 
@@ -37,28 +38,42 @@ app.post("/api/login", userController.login);
 app.get("/api/users", userController.getUsers);
 
 app.post("/api/messages", messageController.sendMesage);
-app.get(
-  "/api/messages/:user1/:user2",
-  messageController.getMessagesBetweenUsers
-);
+app.post("/api/allmessages", messageController.getMessagesBetweenUsers);
 
 io.on("connection", (socket) => {
-  socket.on("sendMessage", (data) => {
+  socket.on("sendMessage", async (data) => {
+    await MessageModel.insertMany([
+      { content: data.message, receiver: data.receiver, sender: data.sender },
+    ]);
 
     io.to(data.to).emit("messageReceived", {
-      message: data.message,
-      from: socket.id
-    })
+      content: data.message,
+      receiver: data.receiver,
+      sender: data.sender,
+    });
+
+    io.to(socket.id).emit("sendMessage", {
+      content: data.message,
+      receiver: data.receiver,
+      sender: data.sender,
+    });
   });
 
-  socket.on("save_socket_id",async (data) => {
+  socket.on("save_socket_id", async (data) => {
     sockets[data.userId] = socket.id;
-    await UserModel.updateOne({ _id: data.userId}, { $set: {socketId: socket.id }});
+    await UserModel.updateOne(
+      { _id: data.userId },
+      { $set: { socketId: socket.id } }
+    );
 
-    const users = await UserModel.find({}, { password: 0});
+    const users = await UserModel.find({}, { password: 0 });
 
-    socket.broadcast.emit("user_updates", {sockets} )
-  })
+    socket.broadcast.emit("user_updates", { sockets });
+  });
+
+  // socket.on("removeSocketId", async (data) => {
+  //   await UserModel.updateOne({ _id: data.userId }, { $set: { socketId: "" } });
+  // });
 
   socket.on("disconnect", () => {
     console.log("User disconnected");

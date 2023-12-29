@@ -30,16 +30,16 @@ const sendMesage = async (req, res) => {
 
 const getMessagesBetweenUsers = async (req, res) => {
   try {
-    const { user1, user2 } = req.params;
+    const { user1, user2 } = req.body;
 
-    const messages = await Message.find({
+    const messages = await MessageModel.find({
       $or: [
         { sender: user1, receiver: user2 },
         { sender: user2, receiver: user1 },
       ],
     }).sort({ timestamp: 1 });
 
-    res.json({ data: messages });
+    return res.json({ data: messages });
   } catch (error) {
     console.error("Error sending message:", error);
     res.status(500).json({ message: "Internal Server Error" });

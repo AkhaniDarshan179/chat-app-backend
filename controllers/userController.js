@@ -75,8 +75,8 @@ const getUsers = async (req, res) => {
     const response = await UserModel.find({ _id: { $ne: userId } });
 
     const userData = response.map((user) => {
-      const { username, socketId, updatedAt } = user;
-      return { username, socketId, updatedAt };
+      const { _id, username, socketId, updatedAt } = user;
+      return { _id, username, socketId, updatedAt };
     });
 
     res.status(200).json({
